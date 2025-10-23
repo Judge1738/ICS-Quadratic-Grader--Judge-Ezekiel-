@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quadratic Solver & Grading System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px auto;
+      max-width: 600px;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      margin-bottom: 30px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #0056b3; }
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+    .result {
+      background-color: #eef;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quadratic Solver & Grading System</h1>
+  <p style="text-align:center;">Enter values carefully and click “Compute”. Errors will be shown below each field if any.</p>
+
+  <!-- Quadratic Solver -->
+  <form id="quadraticForm">
+    <h2>Quadratic Equation Solver</h2>
+    <label for="a">Coefficient a:</label>
+    <input type="number" id="a" step="any" required />
+    <div id="aError" class="error"></div>
+
+    <label for="b">Coefficient b:</label>
+    <input type="number" id="b" step="any" required />
+    <div id="bError" class="error"></div>
+
+    <label for="c">Coefficient c:</label>
+    <input type="number" id="c" step="any" required />
+    <div id="cError" class="error"></div>
+
+    <button type="button" onclick="solveQuadratic()">Compute</button>
+    <button type="reset" onclick="clearQuadratic()">Reset</button>
+
+    <div id="quadResult" class="result"></div>
+  </form>
+
+  <!-- Grading System -->
+  <form id="gradeForm">
+    <h2>Grading System</h2>
+    <label for="score">Enter Score (0–100):</label>
+    <input type="number" id="score" min="0" max="100" required />
+    <div id="scoreError" class="error"></div>
+
+    <button type="button" onclick="calculateGrade()">Compute</button>
+    <button type="reset" onclick="clearGrade()">Reset</button>
+
+    <div id="gradeResult" class="result"></div>
+  </form>
+
+  <script>
+    // Clear messages for quadratic
+    function clearQuadratic() {
+      document.getElementById('quadResult').innerHTML = '';
+      ['aError', 'bError', 'cError'].forEach(id => document.getElementById(id).textContent = '');
+    }
+
+    function solveQuadratic() {
+      clearQuadratic();
+      let a = parseFloat(document.getElementById('a').value);
+      let b = parseFloat(document.getElementById('b').value);
+      let c = parseFloat(document.getElementById('c').value);
+
+      let valid = true;
+      if (isNaN(a)) { document.getElementById('aError').textContent = 'Please enter a valid number for a.'; valid = false; }
+      else if (a === 0) { document.getElementById('aError').textContent = 'a cannot be zero in a quadratic equation.'; valid = false; }
+
+      if (isNaN(b)) { document.getElementById('bError').textContent = 'Please enter a valid number for b.'; valid = false; }
+      if (isNaN(c)) { document.getElementById('cError').textContent = 'Please enter a valid number for c.'; valid = false; }
+
+      if (!valid) return;
+
+      let D = b*b - 4*a*c;
+      let output = `<p>Discriminant (D) = ${D.toFixed(3)}</p>`;
+
+      if (D > 0) {
+        let root1 = (-b + Math.sqrt(D)) / (2*a);
+        let root2 = (-b - Math.sqrt(D)) / (2*a);
+        output += `<p>Two distinct real roots:</p>
+                   <p>x₁ = ${root1.toFixed(3)}, x₂ = ${root2.toFixed(3)}</p>`;
+      } else if (D === 0) {
+        let root = -b / (2*a);
+        output += `<p>One real repeated root:</p><p>x = ${root.toFixed(3)}</p>`;
+      } else {
+        let real = (-b / (2*a)).toFixed(3);
+        let imag = (Math.sqrt(-D) / (2*a)).toFixed(3);
+        output += `<p>Two complex conjugate roots:</p>
+                   <p>x₁ = ${real} + ${imag}i, x₂ = ${real} - ${imag}i</p>`;
+      }
+      document.getElementById('quadResult').innerHTML = output;
+    }
+
+    // Clear messages for grade
+    function clearGrade() {
+      document.getElementById('gradeResult').innerHTML = '';
+      document.getElementById('scoreError').textContent = '';
+    }
+
+    function calculateGrade() {
+      clearGrade();
+      let score = parseInt(document.getElementById('score').value);
+      if (isNaN(score)) {
+        document.getElementById('scoreError').textContent = 'Please enter a number between 0 and 100.';
+        return;
+      }
+      if (score < 0 || score > 100) {
+        document.getElementById('scoreError').textContent = 'Score must be between 0 and 100.';
+        return;
+      }
+
+      let grade;
+      if (score >= 85) grade = 'A+';
+      else if (score >= 75) grade = 'A';
+      else if (score >= 65) grade = 'B+';
+      else if (score >= 60) grade = 'B';
+      else if (score >= 55) grade = 'C+';
+      else if (score >= 50) grade = 'C';
+      else grade = 'D';
+
+      document.getElementById('gradeResult').innerHTML = `<p>Score ${score} → Grade ${grade}</p>`;
+    }
+  </script>
+</body>
+</html>
